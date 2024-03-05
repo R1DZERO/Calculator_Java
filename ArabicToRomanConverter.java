@@ -1,7 +1,7 @@
 public class ArabicToRomanConverter {
-    public static String converter(int number) {
+    public static String converter(int number) throws Exception {
         if (number < 0) {
-            return "Ошибка: в римской системе нет отрицательных чисел.";
+            throw new Exception("Ошибка: в римской системе нет отрицательных чисел.");
         }
 
         StringBuffer result = new StringBuffer();

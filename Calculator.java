@@ -1,18 +1,13 @@
 import java.util.Scanner;
 
 public class Calculator {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         String userInput = scanner.nextLine();
         String firstVar;
         String secondVar;
         String operator;
-        String error;
-        error = userInputHandler(userInput);
-        if (!error.isEmpty()) {
-            System.out.println(error);
-            System.exit(0);
-        }
+        userInputHandler(userInput);
         String[] userInputSeparated = userInput.split(" ");
         firstVar = userInputSeparated[0];
         secondVar = userInputSeparated[2];
@@ -20,25 +15,23 @@ public class Calculator {
         System.out.println(calculate(firstVar, operator, secondVar));
     }
 
-    public static String userInputHandler(String userInput) {
+    public static void userInputHandler(String userInput) throws Exception {
         String[] userInputSeparated = userInput.split(" ");
+
         if (userInputSeparated.length != 3) {
-            return ("Калькулятор может выполнить операцию только с двумя операндами.");
+            throw new Exception("Калькулятор может выполнить операцию только с двумя операндами.");
         }
         String firstVar = userInputSeparated[0];
         String secondVar = userInputSeparated[2];
-        if (isRomanNum(firstVar) != isRomanNum(secondVar) || isNumInt(firstVar) != isNumInt(secondVar)) {
-            return ("Калькулятор поддерживает операции только для операндов одного формата (арабского или римского) и только с целочисленными значениями.");
+        if (isRomanNum(firstVar) && isRomanNum(secondVar)) {
+            firstVar = String.valueOf(RomanToArabicConverter.converter(firstVar));
+            secondVar = String.valueOf(RomanToArabicConverter.converter(secondVar));
         }
-        return "";
-    }
-
-    public static boolean isNumInt(String number) {
-        try {
-            Integer.parseInt(number);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
+        if (isRomanNum(firstVar) != isRomanNum(secondVar)) {
+            throw new Exception("Калькулятор поддерживает операции только для операндов одного формата (арабского или римского) и только с целочисленными значениями.");
+        }
+        if ((Integer.parseInt(firstVar) < 1 || Integer.parseInt(firstVar) > 10) || (Integer.parseInt(secondVar) < 1 || Integer.parseInt(secondVar) > 10)) {
+            throw new Exception("Калькулятор не принимает на ввод значения меньше 1 и больше 10.");
         }
     }
 
@@ -46,11 +39,10 @@ public class Calculator {
         return symbol.charAt(0) == 'I' || symbol.charAt(0) == 'V' || symbol.charAt(0) == 'X';
     }
 
-    public static String calculate(String firstVar, String operator, String secondVar) {
+    public static String calculate(String firstVar, String operator, String secondVar) throws Exception {
         int firstCharInt;
         int secondCharInt;
-        int result = 0;
-        String error = "";
+        int result;
         if (isRomanNum(firstVar) && isRomanNum(secondVar)) {
             firstCharInt = RomanToArabicConverter.converter(firstVar);
             secondCharInt = RomanToArabicConverter.converter(secondVar);
@@ -68,33 +60,28 @@ public class Calculator {
                     result = firstCharInt / secondCharInt;
                     break;
                 default:
-                    error = "Неподдерживаемый оператор";
+                    throw new Exception("Неподдерживаемый оператор");
             }
             return ArabicToRomanConverter.converter(result);
-        } else if (isNumInt(firstVar) && isNumInt(secondVar)) {
-            firstCharInt = Integer.parseInt(firstVar);
-            secondCharInt = Integer.parseInt(secondVar);
-            switch (operator) {
-                case "+":
-                    result = firstCharInt + secondCharInt;
-                    break;
-                case "-":
-                    result = firstCharInt - secondCharInt;
-                    break;
-                case "*":
-                    result = firstCharInt * secondCharInt;
-                    break;
-                case "/":
-                    result = firstCharInt / secondCharInt;
-                    break;
-                default:
-                    error = "Неподдерживаемый оператор";
-            }
         }
-        if (!error.isEmpty()) {
-            return error;
-        } else {
-            return String.valueOf(result);
+        firstCharInt = Integer.parseInt(firstVar);
+        secondCharInt = Integer.parseInt(secondVar);
+        switch (operator) {
+            case "+":
+                result = firstCharInt + secondCharInt;
+                break;
+            case "-":
+                result = firstCharInt - secondCharInt;
+                break;
+            case "*":
+                result = firstCharInt * secondCharInt;
+                break;
+            case "/":
+                result = firstCharInt / secondCharInt;
+                break;
+            default:
+                throw new Exception("Неподдерживаемый оператор");
         }
+        return String.valueOf(result);
     }
 }
